@@ -11,21 +11,23 @@ class CustomerController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function index()
     {
-        //
+        return view('customers.index', [
+            'customers' => Customer::orderBy('username')->get(),
+        ]);
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function create()
     {
-        //
+        return view('customers.create');
     }
 
     /**
@@ -36,7 +38,13 @@ class CustomerController extends Controller
      */
     public function store(StoreCustomerRequest $request)
     {
-        //
+        $request->validate([
+            'username' => 'required',
+        ]);
+
+        Customer::create($request->all());
+
+        return redirect()->route('customers.index')->with('status', 'Customer created successfully');
     }
 
     /**
@@ -58,7 +66,7 @@ class CustomerController extends Controller
      */
     public function edit(Customer $customer)
     {
-        //
+        return view('customers.edit', ['customer' => $customer ]);
     }
 
     /**
@@ -70,7 +78,13 @@ class CustomerController extends Controller
      */
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
-        //
+        $request->validate([
+            'username' => 'required'
+        ]);
+
+        $customer->update($request->input());
+
+        return redirect()->route('customers.index')->with('status', 'Customer updated successfully');
     }
 
     /**
@@ -81,6 +95,7 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
-        //
+        $customer->delete();
+        return redirect()->route('customers.index')->with('status', 'Customer deleted successfully');
     }
 }
